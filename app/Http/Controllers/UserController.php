@@ -12,13 +12,16 @@ use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Response;
 use Activity;
-
+use Auth;
 
 class UserController extends Controller
 {
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
+
+        $this->validate($credentials, User::ruleLogin());
+
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
                 Activity::addToLog('Fail Login, ' . 'invalid_credentials');
@@ -35,8 +38,13 @@ class UserController extends Controller
             return response()->json($responseJson, 500);
         }
         Activity::addToLog('Login');
-        $responseJson = Response::success(['token' => $token]);
-        return response()->json($responseJson);
+        $user = Auth::user();
+        $isAdmin = $user->isAdmin();
+        $user->isAdmin = $isAdmin;
+        $responseJson = Response::success('Success login', $user );
+        return response()->json($responseJson)->withHeaders([
+            'Authorization' => $token
+        ]);
     }
 
     public function register(Request $request)

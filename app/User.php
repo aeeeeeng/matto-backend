@@ -48,8 +48,18 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    public function role() {
+    public function role()
+    {
         return $this->belongsTo('App\Models\UserRole', 'role_id', 'id');
+    }
+
+    public function isAdmin()
+    {
+        $role = $this->role()->first();
+        if($role->name === 'admin') {
+            return true;
+        }
+        return false;
     }
 
     public function hasRole($role)

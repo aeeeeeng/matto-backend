@@ -20,6 +20,15 @@ class User extends Authenticatable implements JWTSubject
         'name', 'email', 'password',
     ];
 
+    public static function ruleLogin()
+    {
+        $rules = [
+            'email' => 'required|email|string|max:255',
+            'password' => 'required|string|min:6'
+        ];
+        return $rules;
+    }
+
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -28,6 +37,11 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function userRole()
+    {
+        return $this->belongsTo('App\Models\UserRole', 'id', 'role_id');
+    }
 
     public function getJWTIdentifier()
     {
