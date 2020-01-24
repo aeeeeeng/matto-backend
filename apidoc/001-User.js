@@ -4,28 +4,59 @@
  * @apiName User Login
  * @apiGroup 01-Users
  *
- * 
- * 
+ *
+ *
  * @apiParamExample {json} PARAMETER
  * {
  *      "username": "aeeeeeng",
  *      "password": "sembarang"
  * }
- * 
- * @apiSuccessExample {json} SUCCESS
+ *
+ * @apiSuccessExample {json} REQUIRED FIELD INPUT
+ * HTTP/1.1 400 BAD REQUEST
+ * {
+ *   "success": false,
+ *   "message": {
+ *       "email": [
+ *           "The email field is required."
+ *       ],
+ *       "password": [
+ *           "The password field is required."
+ *       ]
+ *   }
+ * }
+ *
+ * @apiSuccessExample {json} HEADER RESPONSE AUTHORIZATION
  * HTTP/1.1 200 OK
  * {
- *      "success": true,
- *      "message": "Login Success",
- *      "token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xMjcuMC4wLjE6ODAwMFwvYXBpXC9sb2dpbiIsImlhdCI6MTU3OTUyOTA5MywiZXhwIjoxNTc5NTMyNjkzLCJuYmYiOjE1Nzk1MjkwOTMsImp0aSI6IjRjMGFidFZkU3dMbUtsVkwiLCJzdWIiOjEsInBydiI6Ijg3ZTBhZjFlZjlmZDE1ODEyZmRlYzk3MTUzYTE0ZTBiMDQ3NTQ2YWEifQ.RYqk1XdRG7DJczgciRYz-9IqO024fyk2DVnUdqsvLKo"
+ *      Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xMjcuMC4wLjE6ODAwMFwvYXBpXC9sb2dpbiIsImlhdCI6MTU3OTgwNDYzNCwiZXhwIjoxNTc5ODA4MjM0LCJuYmYiOjE1Nzk4MDQ2MzQsImp0aSI6ImlmeG9KYTFyMlB4MU83Y1YiLCJzdWIiOjEsInBydiI6Ijg3ZTBhZjFlZjlmZDE1ODEyZmRlYzk3MTUzYTE0ZTBiMDQ3NTQ2YWEifQ.aKFjjoa2jp0qpZLCYZlAmLVggynAudQGbKD02hNOKTU"
  * }
+ *
+ *
+ * @apiSuccessExample {json} SUCCESS
+ * HTTP/1.1 200 OK
+ *   {
+ *       "success": true,
+ *       "message": "Success login",
+ *       "data": {
+ *           "_id": "$2y$10$DW64aZpqP4Zr/uOLwDvtX.NbEm1amtSmnF6xoirI5XVPqLm7o/3RO",
+ *           "role_id": "{document}",
+ *           "name": "Syahril Ardi",
+ *           "email": "aeeeeeng@gmail.com",
+ *           "email_verified_at": null,
+ *           "created_at": "2020-01-19 14:09:14",
+ *           "updated_at": "2020-01-19 14:09:14",
+ *           "isAdmin": true
+ *       }
+ *   }
+ *
  * @apiSuccessExample {json} FAIL
  * HTTP/1.1 401 UNAUTHORIZED
  * {
- *      "success": false,
- *      "message": "Login Failed"
+ *   "success": false,
+ *   "message": "invalid_credentials"
  * }
- * 
+ *
  */
 
  /**
@@ -34,8 +65,8 @@
  * @apiName User Register
  * @apiGroup 01-Users
  *
- * 
- * 
+ *
+ *
  * @apiParamExample {json} PARAMETER
  * {
  *      "name": "Syahril Ardi",
@@ -43,7 +74,7 @@
  *      "password": "ikipassword",
  *      "password_confirmation": "ikipassword"
  * }
- * 
+ *
  * @apiSuccessExample {json} REQUIRED FIELD INPUT
  * HTTP/1.1 400 BAD REQUEST
  * {
@@ -64,7 +95,7 @@
  *  HTTP/1.1 200 OK
  * {
  *      "success": true,
- *      "message": 
+ *      "message":
  *      {
  *          "user": {
  *                       "name": "emboh wes",
@@ -82,5 +113,5 @@
  *      "success": false,
  *      "message": "string value"
  * }
- * 
+ *
  */
