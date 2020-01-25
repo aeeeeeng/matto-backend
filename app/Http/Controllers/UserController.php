@@ -74,20 +74,26 @@ class UserController extends Controller
         return response()->json($responseJson,200);
     }
 
-    public function getAuthenticatedUser()
+    public function refreshAuth()
     {
+        $responseJson = Response::success('success authenticated');
+        return response()->json($responseJson);
+    }
+
+    public function logout()
+    {
+        $responseJson = [];
+        $status = 200;
         try {
-            if (!$user = JWTAuth::parseToken()->authenticate()) {
-                return response()->json(['user_not_found'], 404);
-            }
-        } catch(Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
-            return response()->json(['token_expired'], $e->getStatusCode());
-        } catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-            return response()->json(['token_invalid'], $e->getStatusCode());
-        } catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
-            return response()->json(['token_absent'], $e->getStatusCode());
+            auth()->logout(true);
+        } catch(Exception $e) {
+            $responseJson = Response::error($e->getMessage());
+            $status = 500;
         }
-        return response()->json(compact('user'));
+        $responseJson = Response::success('Logout');
+        Activity::addToLog('Logout');
+        return response()->json($responseJson, $status);
+
     }
 
 }

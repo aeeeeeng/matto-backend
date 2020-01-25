@@ -18,6 +18,12 @@ return [
         'passwords' => 'users',
     ],
 
+    'defaults' => [
+        'guard' => 'api',
+        'passwords' => 'users',
+    ],
+
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Guards
@@ -45,6 +51,10 @@ return [
             'driver' => 'token',
             'provider' => 'users',
             'hash' => false,
+        ],
+        'api' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
         ],
     ],
 

@@ -36,6 +36,10 @@ class JwtMiddleware
             }
             return response()->json($responseJson, 401);
         }
-        return $next($request);
+        $user = auth()->user();
+        $token = auth()->tokenById($user->id);
+        return $next($request)->withHeaders([
+            'Authorization' => $token
+        ]);
     }
 }

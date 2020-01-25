@@ -21,8 +21,9 @@ Route::post('register', 'UserController@register');
 Route::post('login', 'UserController@login');
 Route::get('outlet', 'OutletController@outlet');
 
-Route::get('outletAll', 'OutletController@outletAuth')->middleware(['jwt.verify', 'role:client,cashier']);
-Route::get('user', 'UserController@getAuthenticatedUser')->middleware(['jwt.verify']);
+Route::get('outletAll', 'OutletController@outletAuth')->middleware(['jwt.verify', 'role:client,cashier,admin']);
+Route::get('refresh', 'UserController@refreshAuth')->middleware(['jwt.verify']);
+Route::post('logout', 'UserController@logout')->middleware(['jwt.verify']);
 
 
 
