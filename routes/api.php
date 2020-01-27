@@ -13,9 +13,9 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('jwt.verify')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('jwt.verify')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 Route::post('register', 'UserController@register');
 Route::post('login', 'UserController@login');
@@ -24,6 +24,12 @@ Route::get('outlet', 'OutletController@outlet');
 Route::get('outletAll', 'OutletController@outletAuth')->middleware(['jwt.verify', 'role:client,cashier,admin']);
 Route::get('refresh', 'UserController@refreshAuth')->middleware(['jwt.verify']);
 Route::post('logout', 'UserController@logout')->middleware(['jwt.verify']);
+
+Route::group(['middleware' => 'jwt.verify'], function() {
+    Route::group(['prefix' => 'users'], function () {
+        Route::get('/', 'UserController@list')->middleware(['role:admin']);
+    });
+});
 
 
 

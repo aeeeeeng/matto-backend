@@ -29,6 +29,15 @@ class User extends Authenticatable implements JWTSubject
         'password', 'remember_token',
     ];
 
+    public static function ruleLogin()
+    {
+        $rules = [
+            'email' => 'required|email|string|max:255',
+            'password' => 'required|string|min:6'
+        ];
+        return $rules;
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
