@@ -29,6 +29,13 @@ Route::group(['middleware' => 'jwt.verify'], function() {
     Route::group(['prefix' => 'users'], function () {
         Route::get('/', 'UserController@list')->middleware(['role:admin']);
     });
+    Route::group(['prefix' => 'product-types'], function () {
+        Route::get('/', 'Api\ProductType@index')->middleware(['role:admin']);
+        Route::get('/{id}', 'Api\ProductType@show')->middleware(['role:admin']);
+        Route::post('/save', 'Api\ProductType@store')->middleware(['role:admin']);
+        Route::put('/save/{id}', 'Api\ProductType@update')->middleware(['role:admin']);
+        Route::delete('/{id}', 'Api\ProductType@destroy')->middleware(['role:admin']);
+    });
 });
 
 

@@ -32,4 +32,18 @@ class Controller extends BaseController
             $return->throwResponse();
         }
     }
+
+    public function uniqueCode($model, $field, $prefix, $long)
+    {
+        $maxCode = $model::max($field);
+
+        if($maxCode) {
+            preg_match('!\d+!', $maxCode, $matches);
+            $val = intval($matches[0]);
+            $code = $prefix . str_pad($val + 1, $long, "0", STR_PAD_LEFT);
+        } else {
+            $code = $prefix . str_pad(1, $long, "0", STR_PAD_LEFT);
+        }
+        return $code;
+    }
 }
