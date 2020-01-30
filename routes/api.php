@@ -36,6 +36,13 @@ Route::group(['middleware' => 'jwt.verify'], function() {
         Route::put('/save/{id}', 'Api\ProductType@update')->middleware(['role:admin']);
         Route::delete('/{id}', 'Api\ProductType@destroy')->middleware(['role:admin']);
     });
+    Route::group(['prefix' => 'uom'], function () {
+        Route::get('/', 'Api\UomController@index')->middleware(['role:admin']);
+        Route::post('/save', 'Api\UomController@store')->middleware(['role:admin']);
+        Route::get('/{id}', 'Api\UomController@show')->middleware(['role:admin']);
+        Route::put('/save/{id}', 'Api\UomController@update')->middleware(['role:admin']);
+        Route::delete('/{id}', 'Api\UomController@destroy')->middleware(['role:admin']);
+    });
 });
 
 

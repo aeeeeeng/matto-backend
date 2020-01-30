@@ -6,19 +6,22 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use DB;
-use App\Models\ProductType as ProductTypeModel;
+use App\Models\Uom as UomModel;
 use Exception;
 use Activity;
 use Helper;
 use Response;
 
-class ProductType extends Controller
+class UomController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
+
+    const __THIS_CONTROLLER_API = 'Uom';
+
     public function index(Request $request)
     {
         $perPage = (int) Helper::handleRequest($request, 'perPage', 10);
@@ -28,38 +31,39 @@ class ProductType extends Controller
 
         $responseJson = [];
         $status = 200;
-        $productTypes = [];
+        $uom = [];
         $addOnLink = '?perPage=' . $perPage;
 
         try {
-            $productTypes = ProductTypeModel::where('status', '>', 0);
+            $uom = UomModel::where('status', '>', 0);
             if(strlen($dateStart) > 0) {
                 $addOnLink .= '&dateStart=' . $dateStart;
                 $dateStart .= ' 00:00:00';
-                $productTypes->where('created_at', '>=', $dateStart);
+                $uom->where('created_at', '>=', $dateStart);
             }
             if(strlen($dateEnd) > 0) {
                 $addOnLink .= '&dateEnd=' . $dateEnd;
                 $dateEnd .= ' 23:59:59';
-                $productTypes->where('created_at', '<=', $dateEnd);
+                $uom->where('created_at', '<=', $dateEnd);
             }
             if(strlen($keyWord) > 0) {
                 $addOnLink .= '&keyword=' . $keyWord;
-                $productTypes->where(function($query) use ($keyWord){
+                $uom->where(function($query) use ($keyWord){
                     $query->orWhere('name', 'like', '%'.$keyWord.'%');
                     $query->orWhere('code', 'like', '%'.$keyWord.'%');
                 });
             }
-            $productTypes->orderBy('created_at', 'DESC');
-            $productTypes = $productTypes->paginate($perPage);
-            $productTypes->withPath(url('/api/product-types') . $addOnLink);
-            $responseJson = Response::success('Product Type Fetched', $productTypes);
+            $uom->orderBy('created_at', 'DESC');
+            $uom = $uom->paginate($perPage);
+            $uom->withPath(url('/api/uom') . $addOnLink);
+            $responseJson = Response::success(self::__THIS_CONTROLLER_API . ' Fetched', $uom);
+            $status = 200;
         } catch (Exception $e) {
-            Activity::addToLog('Failed Fetch List Product Type');
+            Activity::addToLog('Failed Fetch List ' . self::__THIS_CONTROLLER_API);
             $responseJson = Response::error($e->getMessage());
             $status = 500;
         }
-        Activity::addToLog('Fetch List Product Type');
+        Activity::addToLog('Fetch List ' . self::__THIS_CONTROLLER_API);
         return response()->json($responseJson, $status);
     }
 
@@ -74,29 +78,33 @@ class ProductType extends Controller
         $status = 200;
         $responseJson = [];
         $name = Helper::handleRequest($request, 'name');
+        $full_name = Helper::handleRequest($request, 'full_name');
+        $dataRequest = [];
         $dataRequest['name'] = $name;
-        $this->validate($dataRequest, ProductTypeModel::rule());
+        $dataRequest['full_name'] = $full_name;
+        $this->validate($dataRequest, UomModel::rule());
         DB::beginTransaction();
-        try{
-            $code = $this->uniqueCode(ProductTypeModel::class, 'code', 'PT', 10);
+        try {
+            $code = $this->uniqueCode(UomModel::class, 'code', 'UOM', 10);
             $emailUser = auth()->user()->email;
-            $data = ProductTypeModel::create([
+            $data = UomModel::create([
                 'code' => $code,
-                'name' => $name,
-                'status' => '1',
+                'name' => strtoupper($name),
+                'full_name' => ucwords($full_name),
+                'status' => 1,
                 'created_by' => $emailUser,
-                'updated_by' => $emailUser,
+                'updated_by' => $emailUser
             ]);
             $responseJson = Response::success('Data Saved', $data);
             $status = 200;
             DB::commit();
         } catch (Exception $e) {
             DB::rollback();
-            Activity::addToLog('Failed Save Product Type' . $e->getMessage());
+            Activity::addToLog('Failed Save ' . self::__THIS_CONTROLLER_API . $e->getMessage());
             $responseJson = Response::error($e->getMessage());
             $status = 500;
         }
-        Activity::addToLog('Success Save Product Type');
+        Activity::addToLog('Success Save ' . self::__THIS_CONTROLLER_API);
         return response()->json($responseJson, $status);
     }
 
@@ -111,15 +119,15 @@ class ProductType extends Controller
         $status = 200;
         $responseJson = [];
         try {
-            $productType = ProductTypeModel::findOrFail($id);
-            $responseJson = Response::success('Show Data User', $productType);
+            $uom = UomModel::findOrFail($id);
+            $responseJson = Response::success('Show Data ' . self::__THIS_CONTROLLER_API, $uom);
             $status = 200;
         } catch (Exception $e) {
             $responseJson = Response::error($e->getMessage());
             $status = 500;
-            Activity::addToLog('Fail Show Product Type id = '.$id);
+            Activity::addToLog('Fail Show ' . self::__THIS_CONTROLLER_API . ' id = '.$id);
         }
-        Activity::addToLog('Show Product Type id = '.$id);
+        Activity::addToLog('Show ' . self::__THIS_CONTROLLER_API . ' id = '.$id);
         return response()->json($responseJson, $status);
     }
 
@@ -135,23 +143,26 @@ class ProductType extends Controller
         $status = 200;
         $responseJson = [];
         $name = Helper::handleRequest($request, 'name');
+        $full_name = Helper::handleRequest($request, 'full_name');
         $dataRequest['name'] = $name;
-        $this->validate($dataRequest, ProductTypeModel::ruleUpdate($id));
+        $dataRequest['full_name'] = $full_name;
+        $this->validate($dataRequest, UomModel::ruleUpdate($id));
         DB::beginTransaction();
         try {
-            $model = ProductTypeModel::findOrFail($id);
-            $model->name = $name;
+            $model = UomModel::findOrFail($id);
+            $model->name = strtoupper($name);
+            $model->full_name = ucwords($full_name);
             $model->updated_by = auth()->user()->email;
-            $data = $model->save();
+            $model->save();
             $responseJson = Response::success('Data Saved', $model);
             $status = 200;
-            Activity::addToLog('Success Update Product Types');
+            Activity::addToLog('Success Update ' . self::__THIS_CONTROLLER_API);
             DB::commit();
         } catch (Exception $e) {
             DB::rollback();
             $responseJson = Response::error($e->getMessage());
             $status = 500;
-            Activity::addToLog('Fail Update Product Types ' . $e->getMessage());
+            Activity::addToLog('Fail Update ' . self::__THIS_CONTROLLER_API . $e->getMessage());
         }
         return response()->json($responseJson, $status);
     }
@@ -168,18 +179,18 @@ class ProductType extends Controller
         $responseJson = [];
         DB::beginTransaction();
         try {
-            $productType = ProductTypeModel::findOrFail($id);
-            $productType->status = 0;
-            $productType->save();
-            $responseJson = Response::success('Success deleted', $productType);
+            $model = UomModel::findOrFail($id);
+            $model->status = 0;
+            $model->save();
+            $responseJson = Response::success('Success deleted', $model);
             $status = 200;
-            Activity::addToLog('Success Delete Product Types ');
+            Activity::addToLog('Success Delete ' . self::__THIS_CONTROLLER_API);
             DB::commit();
         } catch (Exception $e) {
             DB::rollback();
             $responseJson = Response::error($e->getMessage());
             $status = 500;
-            Activity::addToLog('Fail Delete Product Types ' . $e->getMessage());
+            Activity::addToLog('Fail Delete ' . self::__THIS_CONTROLLER_API . $e->getMessage());
         }
         return response()->json($responseJson, $status);
     }
