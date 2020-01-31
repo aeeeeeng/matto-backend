@@ -43,6 +43,13 @@ Route::group(['middleware' => 'jwt.verify'], function() {
         Route::put('/save/{id}', 'Api\UomController@update')->middleware(['role:admin']);
         Route::delete('/{id}', 'Api\UomController@destroy')->middleware(['role:admin']);
     });
+    Route::group(['prefix' => 'supplier'], function () {
+        Route::get('/', 'Api\SupplierController@index')->middleware(['role:admin']);
+        Route::get('/{id}', 'Api\SupplierController@show')->middleware(['role:admin']);
+        Route::delete('/{id}', 'Api\SupplierController@destroy')->middleware(['role:admin']);
+        Route::post('/save', 'Api\SupplierController@store')->middleware(['role:admin']);
+        Route::post('/save/{id}', 'Api\SupplierController@update')->middleware(['role:admin']);
+    });
 });
 
 
